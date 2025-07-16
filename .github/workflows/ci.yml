@@ -104,17 +104,11 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     
-    - name: Create GitHub release assets
-      run: |
-        tar -czf toxblock-${{ github.event.release.tag_name }}.tar.gz dist/
-        zip -r toxblock-${{ github.event.release.tag_name }}.zip dist/
-    
     - name: Upload release assets
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          dist/**/*
+        tag_name: ${{ github.event.release.tag_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./toxblock-${{ github.event.release.tag_name }}.tar.gz
-        asset_name: toxblock-${{ github.event.release.tag_name }}.tar.gz
-        asset_content_type: application/gzip
