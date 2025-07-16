@@ -1,4 +1,9 @@
-import { ToxBlock, ToxBlockConfig, ToxBlockError, createToxBlock } from '../index';
+import {
+  ToxBlock,
+  ToxBlockConfig,
+  ToxBlockError,
+  createToxBlock,
+} from '../index';
 import { GoogleGenAI } from '@google/genai';
 
 jest.mock('@google/genai');
@@ -11,21 +16,24 @@ describe('ToxBlock', () => {
   const validConfig: ToxBlockConfig = {
     apiKey: 'test-api-key',
     model: 'gemini-2.0-flash-001',
-    timeout: 5000
+    timeout: 5000,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockGenerateContent = jest.fn();
     const mockModel = {
-      generateContent: mockGenerateContent
+      generateContent: mockGenerateContent,
     };
-    
-    mockGoogleGenAI.mockImplementation(() => ({
-      models: mockModel
-    } as any));
-    
+
+    mockGoogleGenAI.mockImplementation(
+      () =>
+        ({
+          models: mockModel,
+        }) as any
+    );
+
     toxBlock = new ToxBlock(validConfig);
   });
 
@@ -49,7 +57,9 @@ describe('ToxBlock', () => {
 
     it('should throw error for missing API key', () => {
       expect(() => new ToxBlock({} as ToxBlockConfig)).toThrow(ToxBlockError);
-      expect(() => new ToxBlock({} as ToxBlockConfig)).toThrow('API key is required and must be a string');
+      expect(() => new ToxBlock({} as ToxBlockConfig)).toThrow(
+        'API key is required and must be a string'
+      );
     });
 
     it('should throw error for invalid API key type', () => {
@@ -76,8 +86,8 @@ describe('ToxBlock', () => {
           isProfane: false,
           confidence: 0.9,
           language: 'en',
-          details: 'Clean text'
-        })
+          details: 'Clean text',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -87,7 +97,7 @@ describe('ToxBlock', () => {
         isProfane: false,
         confidence: 0.9,
         language: 'en',
-        details: 'Clean text'
+        details: 'Clean text',
       });
     });
 
@@ -97,8 +107,8 @@ describe('ToxBlock', () => {
           isProfane: true,
           confidence: 0.95,
           language: 'en',
-          details: 'Contains profanity'
-        })
+          details: 'Contains profanity',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -108,7 +118,7 @@ describe('ToxBlock', () => {
         isProfane: true,
         confidence: 0.95,
         language: 'en',
-        details: 'Contains profanity'
+        details: 'Contains profanity',
       });
     });
 
@@ -119,20 +129,26 @@ describe('ToxBlock', () => {
         isProfane: false,
         confidence: 1.0,
         language: 'unknown',
-        details: 'Empty text'
+        details: 'Empty text',
       });
     });
 
     it('should throw error for invalid input', async () => {
       await expect(toxBlock.checkText('')).rejects.toThrow(ToxBlockError);
-      await expect(toxBlock.checkText(null as any)).rejects.toThrow(ToxBlockError);
-      await expect(toxBlock.checkText(undefined as any)).rejects.toThrow(ToxBlockError);
-      await expect(toxBlock.checkText(123 as any)).rejects.toThrow(ToxBlockError);
+      await expect(toxBlock.checkText(null as any)).rejects.toThrow(
+        ToxBlockError
+      );
+      await expect(toxBlock.checkText(undefined as any)).rejects.toThrow(
+        ToxBlockError
+      );
+      await expect(toxBlock.checkText(123 as any)).rejects.toThrow(
+        ToxBlockError
+      );
     });
 
     it('should handle API timeout', async () => {
-      mockGenerateContent.mockImplementation(() => 
-        new Promise(resolve => setTimeout(resolve, 6000))
+      mockGenerateContent.mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 6000))
       );
 
       await expect(toxBlock.checkText('test')).rejects.toThrow(ToxBlockError);
@@ -152,7 +168,7 @@ describe('ToxBlock', () => {
 
     it('should handle malformed JSON response with fallback parsing', async () => {
       const mockResponse = {
-        text: 'This text contains profane content: true'
+        text: 'This text contains profane content: true',
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -162,13 +178,13 @@ describe('ToxBlock', () => {
         isProfane: true,
         confidence: 0.5,
         language: 'unknown',
-        details: 'Fallback parsing used'
+        details: 'Fallback parsing used',
       });
     });
 
     it('should handle JSON response with code blocks', async () => {
       const mockResponse = {
-        text: '```json\n{"isProfane": false, "confidence": 0.8, "language": "en"}\n```'
+        text: '```json\n{"isProfane": false, "confidence": 0.8, "language": "en"}\n```',
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -178,7 +194,7 @@ describe('ToxBlock', () => {
         isProfane: false,
         confidence: 0.8,
         language: 'en',
-        details: undefined
+        details: undefined,
       });
     });
 
@@ -187,8 +203,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: 1.5,
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -202,8 +218,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: -0.5,
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -216,15 +232,15 @@ describe('ToxBlock', () => {
       const customPrompt = 'Custom analysis: {TEXT}';
       const customToxBlock = new ToxBlock({
         ...validConfig,
-        customPrompt
+        customPrompt,
       });
 
       const mockResponse = {
         text: JSON.stringify({
           isProfane: false,
           confidence: 0.8,
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -232,7 +248,7 @@ describe('ToxBlock', () => {
 
       expect(mockGenerateContent).toHaveBeenCalledWith({
         model: 'gemini-2.0-flash-001',
-        contents: 'Custom analysis: test'
+        contents: 'Custom analysis: test',
       });
     });
   });
@@ -243,8 +259,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: 0.9,
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -259,10 +275,18 @@ describe('ToxBlock', () => {
     it('should handle mixed results', async () => {
       mockGenerateContent
         .mockResolvedValueOnce({
-          text: JSON.stringify({ isProfane: false, confidence: 0.9, language: 'en' })
+          text: JSON.stringify({
+            isProfane: false,
+            confidence: 0.9,
+            language: 'en',
+          }),
         })
         .mockResolvedValueOnce({
-          text: JSON.stringify({ isProfane: true, confidence: 0.95, language: 'en' })
+          text: JSON.stringify({
+            isProfane: true,
+            confidence: 0.95,
+            language: 'en',
+          }),
         });
 
       const texts = ['Hello', 'BadWord'];
@@ -276,7 +300,11 @@ describe('ToxBlock', () => {
     it('should handle errors gracefully in batch processing', async () => {
       mockGenerateContent
         .mockResolvedValueOnce({
-          text: JSON.stringify({ isProfane: false, confidence: 0.9, language: 'en' })
+          text: JSON.stringify({
+            isProfane: false,
+            confidence: 0.9,
+            language: 'en',
+          }),
         })
         .mockRejectedValueOnce(new Error('API Error'));
 
@@ -291,8 +319,12 @@ describe('ToxBlock', () => {
     });
 
     it('should throw error for invalid input', async () => {
-      await expect(toxBlock.checkTexts(null as any)).rejects.toThrow(ToxBlockError);
-      await expect(toxBlock.checkTexts('not an array' as any)).rejects.toThrow(ToxBlockError);
+      await expect(toxBlock.checkTexts(null as any)).rejects.toThrow(
+        ToxBlockError
+      );
+      await expect(toxBlock.checkTexts('not an array' as any)).rejects.toThrow(
+        ToxBlockError
+      );
     });
 
     it('should handle empty array', async () => {
@@ -306,7 +338,7 @@ describe('ToxBlock', () => {
       const config = toxBlock.getConfig();
       expect(config).toEqual({
         model: 'gemini-2.0-flash-001',
-        timeout: 5000
+        timeout: 5000,
       });
     });
   });
@@ -322,7 +354,11 @@ describe('ToxBlock', () => {
 
     it('should create error with original error', () => {
       const originalError = new Error('Original');
-      const error = new ToxBlockError('Test message', 'TEST_CODE', originalError);
+      const error = new ToxBlockError(
+        'Test message',
+        'TEST_CODE',
+        originalError
+      );
       expect(error.originalError).toBe(originalError);
     });
   });
@@ -341,8 +377,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: 0.9,
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -356,8 +392,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: 0.9,
-          language: 'unknown'
-        })
+          language: 'unknown',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -371,8 +407,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: 0.9,
-          language: 'mixed'
-        })
+          language: 'mixed',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -384,8 +420,8 @@ describe('ToxBlock', () => {
       const mockResponse = {
         text: JSON.stringify({
           isProfane: false,
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
@@ -398,8 +434,8 @@ describe('ToxBlock', () => {
         text: JSON.stringify({
           isProfane: false,
           confidence: 'high',
-          language: 'en'
-        })
+          language: 'en',
+        }),
       };
       mockGenerateContent.mockResolvedValue(mockResponse);
 
