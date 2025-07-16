@@ -207,11 +207,12 @@ Response:`;
       };
     }
 
+    let timeoutId: NodeJS.Timeout | undefined;
     try {
       const prompt = this.customPrompt.replace('{TEXT}', text);
 
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           reject(new Error('Request timeout'));
         }, this.timeout);
       });
@@ -237,6 +238,10 @@ Response:`;
         'ANALYSIS_FAILED',
         error instanceof Error ? error : new Error(String(error))
       );
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     }
   }
 
