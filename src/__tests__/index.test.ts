@@ -442,5 +442,71 @@ describe('ToxBlock', () => {
       const result = await toxBlock.checkText('test');
       expect(result.confidence).toBe(0.5);
     });
+
+    it('should handle non-Error objects thrown during analysis', async () => {
+      mockGenerateContent.mockRejectedValue('String error');
+
+      await expect(toxBlock.checkText('test')).rejects.toThrow(ToxBlockError);
+    });
+
+    it('should handle non-Error objects in batch processing', async () => {
+      mockGenerateContent
+        .mockResolvedValueOnce({
+          text: JSON.stringify({
+            isProfane: false,
+            confidence: 0.9,
+            language: 'en',
+          }),
+        })
+        .mockRejectedValueOnce('String error');
+
+      const texts = ['Hello', 'Test'];
+      const results = await toxBlock.checkTexts(texts);
+
+      expect(results).toHaveLength(2);
+      expect(results[0]?.isProfane).toBe(false);
+      expect(results[1]?.isProfane).toBe(false);
+      expect(results[1]?.confidence).toBe(0);
+      expect(results[1]?.details).toContain('Error: Failed to analyze text');
+    });
+
+    it('should handle fallback parsing with no matching keywords', async () => {
+      const mockResponse = {
+        text: 'This is a clean response with no trigger words',
+      };
+      mockGenerateContent.mockResolvedValue(mockResponse);
+
+      const result = await toxBlock.checkText('test');
+
+      expect(result).toEqual({
+        isProfane: false,
+        confidence: 0.5,
+        language: 'unknown',
+        details: 'Fallback parsing used',
+      });
+    });
+
+    it('should handle non-Error objects in checkTexts error handling', async () => {
+      mockGenerateContent
+        .mockResolvedValueOnce({
+          text: JSON.stringify({
+            isProfane: false,
+            confidence: 0.9,
+            language: 'en',
+          }),
+        })
+        .mockImplementationOnce(() => {
+          throw 'Non-error object';
+        });
+
+      const texts = ['Hello', 'Test'];
+      const results = await toxBlock.checkTexts(texts);
+
+      expect(results).toHaveLength(2);
+      expect(results[0]?.isProfane).toBe(false);
+      expect(results[1]?.isProfane).toBe(false);
+      expect(results[1]?.confidence).toBe(0);
+      expect(results[1]?.details).toContain('Error: Failed to analyze text');
+    });
   });
 });
