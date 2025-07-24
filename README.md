@@ -2,7 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/toxblock.svg)](https://badge.fury.io/js/toxblock)
 [![CI/CD Pipeline](https://github.com/sw3do/toxblock/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/sw3do/toxblock/actions)
-[![codecov](https://codecov.io/gh/sw3do/toxblock/branch/main/graph/badge.svg)](https://codecov.io/gh/sw3do/toxblock)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A professional TypeScript module that uses Google's Gemini AI to detect profanity, toxic content, and inappropriate language in **all languages**. Built with enterprise-grade quality, comprehensive testing, and full TypeScript support.
