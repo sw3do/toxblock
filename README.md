@@ -282,7 +282,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## 📞 Support
 
-- 📧 Email: support@toxblock.dev
+- 📧 Email: sw3doo@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/sw3do/toxblock/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/sw3do/toxblock/discussions)
 
@@ -294,4 +294,4 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ---
 
-**Made with ❤️ by the ToxBlock team**
+**Made with ❤️ by the Sw3doo**
