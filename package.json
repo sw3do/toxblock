@@ -1,6 +1,6 @@
 {
   "name": "toxblock",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A professional TypeScript module that uses Gemini AI to detect profanity and toxic content in all languages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
